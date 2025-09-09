@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+            background-size: 400% 400%;
+            animation: gradientBackground 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer; /* Makes the default cursor a pointer (hand) */
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Background text */
+        .background-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            top: 10px; /* Move it to the top */
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 1;
+            user-select: none;
+            pointer-events: none; /* Ensures the background text doesn't interfere with other elements */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 300px;
+            transform: perspective(800px) rotateX(10deg) rotateY(10deg);
+            animation: moveContainer 5s infinite alternate;
+            z-index: 2; /* Ensure it's above the background text */
+        }
+
+        @keyframes moveContainer {
+            0% {
+                transform: perspective(800px) rotateX(10deg) rotateY(10deg);
+            }
+            100% {
+                transform: perspective(800px) rotateX(-10deg) rotateY(-10deg);
+            }
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: transform 0.3s ease-in-out, border-color 0.3s ease;
+        }
+
+        input:focus {
+            transform: scale(1.05);
+            border-color: #4facfe;
+        }
+
+        button {
+            background: #4facfe;
+            border: none;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background: #00c6ff;
+            transform: scale(1.1); /* Slight scaling effect on hover */
+        }
+
+        #weather-info {
+            margin-top: 20px;
+            transform: translateZ(30px);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        img {
+            margin-top: 10px;
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-text">
+        This app is made by Shashank Shekhar
+    </div>
+    <div class="container">
+        <h1>Weather App</h1>
+        <input type="text" id="city" placeholder="Enter city name">
+        <button onclick="getWeather()">Get Weather</button>
+        <div id="weather-info"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('city').value;
+            if (!city) return alert('Please enter a city name');
+            
+            const apiKey = '4c19caec65f24b5b8a1172514250502'; // Your API Key
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city},IN&aqi=yes`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('weather-info').innerHTML = `<p>${data.error.message}</p>`;
+                    return;
+                }
+                
+                document.getElementById('weather-info').innerHTML = `
+                    <h2>${data.location.name}, ${data.location.country}</h2>
+                    <p>Temperature: ${data.current.temp_c}°C</p>
+                    <p>Condition: ${data.current.condition.text}</p>
+                    <img src="${data.current.condition.icon}" alt="Weather Icon">
+                `;
+            } catch (error) {
+                document.getElementById('weather-info').innerHTML = '<p>Error fetching data</p>';
+            }
+        }
+    </script>
+</body>
+</html>
